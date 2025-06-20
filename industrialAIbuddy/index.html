@@ -241,51 +241,19 @@
             <li><a href="#architecture">Architecture</a></li>
             <li><a href="#aws-services">AWS Services</a></li>
             <li><a href="#deployment">Deployment</a></li>
-            <li><a href="#demo">Demo</a></li>
             <li><a href="#faq">FAQ</a></li>
         </ul>
     </div>
     
     <div class="summary">
-        <p><strong>Summary:</strong> This implementation guide provides an overview of the Industrial AI Buddy, a digital twin powered by Amazon Bedrock solution. It includes the reference architecture, components, deployment steps, and configuration instructions for deploying the solution on Amazon Web Services (AWS). This guide is intended for Solution Architects, Business Decision Makers, DevOps Engineers, and Cloud Professionals who want to implement an interactive digital twin with AI capabilities in their environment.</p>
+        <p><strong>Summary:</strong> This implementation guide provides an overview of the Industrial AI Buddy, a digital twin powered by Amazon Bedrock solution. It includes the reference architecture, components, deployment steps, and configuration instructions for deploying the solution. This guide is intended for professionals who want to implement an interactive digital twin with AI capabilities in their environment.</p>
     </div>
     
     <h2 id="overview">Overview</h2>
-    <p>Industrial AI Buddy is a cloud-rendered digital twin powered by an Amazon Bedrock AI assistant. This Unreal Engine-powered environment connects to an Amazon Bedrock agent, providing real-time information about a plant's technical details and processes. Users interact via voice with the AI guide, exploring the facility and learning about its operations. The system uses a Retrieval Augmented Generation (RAG) approach, incorporating plant documentation for comprehensive information, and an AI agent that can retrieve operational plant parameters.</p>
-    
-    <h3>Key Features</h3>
-    <ul>
-        <li>Interactive virtual 3D environment of a manufacturing facility</li>
-        <li>Amazon Bedrock voice assistant integration for natural language interaction</li>
-        <li>Documentation helper for plant processes and worker training scenarios</li>
-        <li>Real-time information retrieval about facility operations and equipment</li>
-        <li>Multilingual support (English, French, Spanish)</li>
-    </ul>
-    
-    <h3>Business Impact</h3>
-    <p>This solution is based on a real-world implementation by a major automotive customer. It provides an anonymized demo to engage with customers from manufacturing and energy industries, offering a powerful way to visualize and interact with complex industrial environments.</p>
-    
-    <h3>Target Industries</h3>
-    <ul>
-        <li>Automotive</li>
-        <li>Manufacturing</li>
-        <li>Logistics</li>
-        <li>Pharmaceutical</li>
-        <li>Energy</li>
-        <li>Construction</li>
-    </ul>
-    
-    <h3>Use Cases</h3>
-    <ul>
-        <li>Employee training in safe virtual environments</li>
-        <li>Real-time collaboration between remote teams</li>
-        <li>Operations and maintenance support</li>
-        <li>Facility exploration and familiarization</li>
-        <li>Process visualization and explanation</li>
-    </ul>
-    
+    <p>Industrial AI Buddy is a cloud-rendered digital twin powered by an Amazon Bedrock AI assistant. This Unreal Engine-powered environment connects to an Amazon Bedrock agent, providing real-time information about technical processes or documentation. Users interact via voice with the AI guide, exploring the environment and learning about its operations. The system uses a Retrieval Augmented Generation (RAG) approach, incorporating documentation for comprehensive information, and an AI agent that can retrieve operational parameters. Optionally a cloud stream service such as Gamelift streams can be used to run the application.</p>
+   
     <h2 id="architecture">Architecture Overview</h2>
-    <p>The Industrial AI Buddy solution combines a 3D digital twin environment with powerful AI capabilities from Amazon Bedrock. The architecture enables seamless voice interaction, knowledge retrieval, and visual representation of industrial facilities.</p>
+    <p>The Industrial AI Buddy solution combines a 3D digital twin environment with AI capabilities from Amazon Bedrock. The architecture enables seamless voice interaction with Transcribe and Polly, knowledge retrieval with Amazon Bedrock knowledge base, and the visual representation of the Digital twin rendered in Gamelift streams.</p>
     
     <h3>Architecture Diagram</h3>
     <img src="diagram.png" alt="Architecture Diagram" class="architecture-diagram">
@@ -293,15 +261,15 @@
     
     <h3>Technical Flow</h3>
     <ol>
-        <li>User connects directly to the Unreal Engine 3D application through Amazon GameLift Streams. They can navigate the environment to explore the facility using controller-based movement or WASD keys.</li>
-        <li>When the user presses a button to invoke the GenAI assistant, they communicate via voice using an external microphone. A Lambda function receives the user prompt and user location data (which station they are near, nearby equipment, etc.). Amazon Transcribe converts voice to text.</li>
-        <li>The Lambda function calls Amazon Bedrock with the following components:
+        <li>User connects directly to 3D application through Amazon GameLift Streams.</li>
+        <li>Invoke the GenAI assistant via voice. Lambda function receives user prompt and user location data. Amazon Transcribe converts voice to text.</li>
+        <li>User prompt and metadata sent to Amazon Bedrock:
             <ul>
-                <li>Knowledge base query using the user prompt and environment metadata. The knowledge base contains facility and machinery equipment documentation.</li>
-                <li>Agent query using three tools: Knowledge base, Garnet framework tool (for contextual AI), and reparation tickets tool.</li>
+                <li>Knowledge base query with metadata filtering.</li>
+                <li>(Optional) Can trigger a Bedrock agent to perform actions.</li>
             </ul>
         </li>
-        <li>The Bedrock text response is sent to Amazon Polly for voice conversion. The user receives voice and text responses to their questions (e.g., "What is this machine doing?", "Which processes take place in this station?", "How should I operate this equipment?", "Can you open a reparation ticket?", "What are the coordinates of this machine?").</li>
+        <li>Bedrock response sent to Amazon Polly for voice output. User receives voice and text responses to their questions.</li>
     </ol>
     
     <h2 id="aws-services">AWS Services Used</h2>
@@ -315,42 +283,42 @@
         </thead>
         <tbody>
             <tr>
-                <td>Amazon Bedrock</td>
+                <td><a href="https://aws.amazon.com/bedrock/">Amazon Bedrock</a></td>
                 <td>Core</td>
                 <td>Provides the foundation model for AI assistant capabilities and knowledge base integration</td>
             </tr>
             <tr>
-                <td>Amazon GameLift Streams</td>
-                <td>Core</td>
+                <td><a href="https://aws.amazon.com/gamelift/streams/">Amazon Gamelift streams</a></td>
+                <td>Optional</td>
                 <td>Delivers cloud-rendered 3D application to users' devices</td>
             </tr>
             <tr>
-                <td>Amazon API Gateway</td>
+                <td><a href="https://aws.amazon.com/api-gateway/">Amazon api gateway</a></td>
                 <td>Core</td>
                 <td>Manages API endpoints for communication between components</td>
             </tr>
             <tr>
-                <td>AWS Lambda</td>
+                <td><a href="https://aws.amazon.com/lambda/">AWS Lambda</a></td>
                 <td>Core</td>
                 <td>Processes user inputs, queries knowledge base, and handles responses</td>
             </tr>
             <tr>
-                <td>Amazon S3</td>
+                <td><a href="https://aws.amazon.com/s3/">Amazon S3</a></td>
                 <td>Core</td>
                 <td>Stores documentation for the knowledge base</td>
             </tr>
             <tr>
-                <td>Amazon Transcribe</td>
+                <td><a href="https://aws.amazon.com/transcribe/">Amazon Transcribe</a></td>
                 <td>Core</td>
                 <td>Converts user voice input to text</td>
             </tr>
             <tr>
-                <td>Amazon Polly</td>
+                <td><a href="https://aws.amazon.com/polly/">Amazon Polly</a></td>
                 <td>Core</td>
                 <td>Converts text responses to natural-sounding voice</td>
             </tr>
             <tr>
-                <td>Amazon CloudFront</td>
+                <td><a href="https://aws.amazon.com/cloudfront/">Amazon CloudFront</a></td>
                 <td>Optional</td>
                 <td>Delivers web application content for GameLift Streams integration</td>
             </tr>
@@ -360,7 +328,7 @@
     <h3>Cost Considerations</h3>
     <p>The main cost drivers for this solution are:</p>
     <ul>
-        <li>Amazon GameLift Streams: Usage-based pricing for stream time</li>
+        <li>Amazon GameLift Streams: Usage-based pricing for stream class and running time</li>
         <li>Amazon Bedrock: Usage-based pricing for number of tokens processed</li>
     </ul>
     <p>For detailed pricing information, visit <a href="https://aws.amazon.com/gamelift/streams/pricing/" target="_blank">Amazon GameLift Streams Pricing</a> and <a href="https://aws.amazon.com/bedrock/pricing/" target="_blank">Amazon Bedrock Pricing</a>.</p>
@@ -377,196 +345,94 @@
         <li>AWS CLI installed and configured</li>
         <li>Node.js and npm installed</li>
         <li>AWS CDK installed (<code>npm install -g aws-cdk</code>)</li>
+        <li>Docker installed and daemon running</li>
     </ul>
     
     <h4>Deployment Steps</h4>
     <div class="code-block">
         <div class="code-block-header">Terminal</div>
         <pre><code># Clone the repository
-git clone https://github.com/IgnacioSanchezAlvarado/IgnacioSanchezAlvarado.github.io.git
-cd IgnacioSanchezAlvarado.github.io/BedrockKnowledgeBaseVoice
+git clone https://github.com/IgnacioSanchezAlvarado/BedrockKnowledgeBaseVoice
+cd BedrockKnowledgeBaseVoice
 
 # Install dependencies
 npm install
 
+# Build project
+npm run build
+
+# (Optional) bootstrap
+cdk bootstrap
+
 # Deploy the CDK stack
-cdk deploy</code></pre>
+cdk deploy
+</code></pre>
     </div>
     
     <h4>Setting Up the Knowledge Base</h4>
     <p>After deploying the CDK stack, you need to upload documentation to the S3 bucket and sync it with the knowledge base:</p>
     <ol>
-        <li>Locate the S3 bucket name from the CDK output (DocumentBucketName)</li>
-        <li>Upload your facility documentation to the S3 bucket:
-            <div class="code-block">
-                <div class="code-block-header">Terminal</div>
-                <pre><code>aws s3 cp facility_overview.md s3://your-document-bucket-name/</code></pre>
-            </div>
-        </li>
-        <li>Sync the knowledge base with the new documents:
-            <div class="code-block">
-                <div class="code-block-header">Terminal</div>
-                <pre><code>aws bedrock-agent start-ingestion-job \
-    --knowledge-base-id your-knowledge-base-id \
-    --data-source-id your-data-source-id</code></pre>
-            </div>
-        </li>
+        <li>Locate the S3 bucket name from the CDK output <code>DocumentBucketName</code></li>
+        <li>Upload your facility documentation to the S3 bucket:</li>
+        <li>Sync the knowledge base with the new documents.</li>
+    </ol>
+
+    <p>More info at <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/kb-data-source-sync-ingest.html">Sync your data with your Amazon Bedrock knowledge base</a></p>
+    
+    <p>(Optional) You can download a sample facility documentation file to add to your knowledge base:</p>
+    <a href="facility_overview.pdf" download class="button">Download Sample Facility Documentation</a>
+    
+    <h3>Step 2: connect a 3D application with the bedrock voice interaction backend</h3>
+    <p>By using the API endpoint obtained in the previous step, cdk output: <code>ApiUrl</code>, you can connect any 3D application that have audio capturing and reproducing capabilities with Amazon Bedrock via voice. Following you can find 2 options to use as the final 3D application:</p>
+    
+    <h4>Option 1: Use the Sample Game</h4>
+    <p>You can use a pre-built sample game to test the solution:</p>
+    <p>[Placeholder for sample game link]</p>
+    
+    <p><b>Important Note:</b> When executing this app you'll need to include the API url endpoint as command line. More info at <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/command-line-arguments-in-unreal-engine">Command-line arguments UE doc</a></p>
+    <div class="code-block">
+        <div class="code-block-header">Game Start Command</div>
+        <pre><code>SampleGame.exe -ApiEndpoint=https://your-api-gateway-url.execute-api.region.amazonaws.com/prod/</code></pre>
+    </div>
+    
+    <h4>Option 2: Use the Source Project</h4>
+    <p>If you want to customize the Unreal Engine project:</p>
+    <ol>
+        <li>Clone the source repository: <a href="" target="_blank">https://github.com/IgnacioSanchezAlvarado/pending repo link</a></li>
+        <li>Open the project in Unreal Engine</li>
+        <li>Replace the API Gateway URL in the code with your own</li>
+        <li>Modify the project based on your needs. Build the game package.</li>
     </ol>
     
-    <p>You can download a sample facility documentation file to add to your knowledge base:</p>
-    <a href="facility_overview.md" download class="button">Download Sample Facility Documentation</a>
-    
-    <h3>Step 2: Deploy the Solution in Amazon GameLift Streams</h3>
-    <p>Amazon GameLift Streams allows you to stream the Unreal Engine application to users' devices without requiring them to install any software.</p>
-    
-    <h4>Creating an Application in GameLift Streams</h4>
+    <h3>Step 3: (Optional) Upload the UE package to Gamelift streams</h3>
+
+    <p>With the project built and the API url endpoint added you can execute the application and start the Bedrock voice interaction. If you want to deploy the app in a cloud streaming service like Gamelift streams follow the next intructions:</p>
+
+      <h4>Creating an Application in GameLift Streams</h4>
     <ol>
-        <li>Navigate to the <a href="https://console.aws.amazon.com/gamelift/home" target="_blank">Amazon GameLift console</a></li>
-        <li>Select "Streams" from the navigation pane</li>
+        <li>Upload your entire game build folder into a new s3 bucket in the region you want to deploy the stream.
+        <li>Navigate to the <a href="https://console.aws.amazon.com/gameliftstreams/home" target="_blank">Amazon GameLift streams console</a></li>
+        <li>Select "Applications" from the navigation pane</li>
         <li>Click "Create application"</li>
-        <li>Enter a name for your application</li>
+        <li>Enter a name for your application and select the game build s3 bucket</li>
         <li>Configure the application settings according to your requirements</li>
         <li>Click "Create"</li>
     </ol>
     
     <p>For detailed instructions on creating applications in GameLift Streams, refer to the <a href="https://docs.aws.amazon.com/gamelift/latest/developerguide/streams-applications.html" target="_blank">Amazon GameLift Streams documentation</a>.</p>
-    
+
     <h4>Creating Stream Groups</h4>
     <ol>
-        <li>In the GameLift console, select your application</li>
         <li>Navigate to the "Stream groups" tab</li>
         <li>Click "Create stream group"</li>
-        <li>Configure the stream group settings</li>
+        <li>Select your previous application and configure the stream settings</li>
         <li>Click "Create"</li>
     </ol>
     
     <p>For detailed instructions on creating stream groups, refer to the <a href="https://docs.aws.amazon.com/gamelift/latest/developerguide/streams-stream-groups.html" target="_blank">Amazon GameLift Stream Groups documentation</a>.</p>
     
-    <h4>Adding the Unreal Engine Application</h4>
-    <p>You have two options for adding the Unreal Engine application to GameLift Streams:</p>
-    
-    <h5>Option 1: Use the Sample Game</h5>
-    <p>You can use a pre-built sample game to test the solution:</p>
-    <p>[Placeholder for sample game link]</p>
-    
-    <p>When uploading the sample game to GameLift Streams, you'll need to specify the API Gateway URL as a game start command parameter:</p>
-    <div class="code-block">
-        <div class="code-block-header">Game Start Command</div>
-        <pre><code>-ApiGatewayUrl=https://your-api-gateway-url.execute-api.region.amazonaws.com/prod/</code></pre>
-    </div>
-    
-    <h5>Option 2: Use the Source Project</h5>
-    <p>If you want to customize the Unreal Engine project:</p>
-    <ol>
-        <li>Clone the source repository: <a href="https://github.com/IgnacioSanchezAlvarado/IndustrialAIBuddyUEproject" target="_blank">https://github.com/IgnacioSanchezAlvarado/IndustrialAIBuddyUEproject</a></li>
-        <li>Open the project in Unreal Engine</li>
-        <li>Replace the API Gateway URL in the code with your own</li>
-        <li>Build the game</li>
-        <li>Upload the built game to GameLift Streams</li>
-    </ol>
-    
-    <h3>Step 3: (Optional) Deploy the Web Application</h3>
-    <p>If you want to publish the application and share it with others, you can deploy a web application that connects with the GameLift Streams service:</p>
-    
-    <div class="code-block">
-        <div class="code-block-header">Terminal</div>
-        <pre><code># Clone the repository
-git clone https://github.com/aws-samples/sample-amazon-gamelift-streams-react-app.git
-cd sample-amazon-gamelift-streams-react-app
+    <p>You can test the stream directly in the Gamelift streams console. If you want to deploy the stream in a web app to share externally with other users you can use the next CDK sample stack: <a href="https://github.com/aws-samples/sample-amazon-gamelift-streams-react-app">sample-amazon-gamelift-streams-react-app</a>
 
-# Install dependencies
-npm install
-
-# Deploy the CDK stack
-cdk deploy</code></pre>
-    </div>
-    
-    <p>For detailed instructions, refer to the documentation in the <a href="https://github.com/aws-samples/sample-amazon-gamelift-streams-react-app" target="_blank">sample-amazon-gamelift-streams-react-app repository</a>.</p>
-    
-    <h2 id="demo">Demo Guide</h2>
-    <p>This section provides guidance on how to demonstrate the Industrial AI Buddy solution.</p>
-    
-    <h3>Demo Controls</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Action</th>
-                <th>Controller</th>
-                <th>Keyboard/Mouse</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Move character</td>
-                <td>Left joystick</td>
-                <td>WASD keys</td>
-            </tr>
-            <tr>
-                <td>Move camera</td>
-                <td>Right joystick</td>
-                <td>Mouse</td>
-            </tr>
-            <tr>
-                <td>Change language</td>
-                <td>Press X</td>
-                <td>Press L key</td>
-            </tr>
-            <tr>
-                <td>Ask question</td>
-                <td>Press and hold B</td>
-                <td>Press and hold Enter key</td>
-            </tr>
-            <tr>
-                <td>Reset app</td>
-                <td>Press Select for 2 seconds</td>
-                <td>Press Delete key for 2 seconds</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <h3>Example Demo Flow (3-5 minutes)</h3>
-    <ol>
-        <li>Walk to one of the closer areas (storage or working station) and explore the facility
-            <ul>
-                <li>While moving around, discuss the digital twin concept, business benefits, and use cases (training in safe environments, real-time collaborations, operations and maintenance)</li>
-            </ul>
-        </li>
-        <li>Approach one of the items/equipment. When close to it, press the AI assistant button (keep it pressed) and speak to the microphone:
-            <ul>
-                <li>Example question: "Can you explain what this machine is?"</li>
-                <li>Example question: "What are its operating parameters?"</li>
-                <li>Example question: "What are the recommended maintenance procedures?"</li>
-            </ul>
-        </li>
-        <li>Move to a different area (recommended: power generation or assembly area)
-            <ul>
-                <li>While moving, discuss the GenAI benefits applied to an industrial scope, how technical information can reach users in a conversational, immersive style</li>
-            </ul>
-        </li>
-        <li>Ask more questions:
-            <ul>
-                <li>Example question: "What are the processes taking place in this area?"</li>
-                <li>Example question: "What are their safety indications?"</li>
-                <li>Example question: "Can you elaborate more on the last guidance?"</li>
-            </ul>
-        </li>
-        <li>Finish demo and restart application
-            <ul>
-                <li>Discuss the technologies used (GameLift Streams, Bedrock, Unreal Engine)</li>
-                <li>Suggest ideas for building a similar PoC</li>
-            </ul>
-        </li>
-        <li>Optional: Show multilingual capability by pressing the language button and asking a question in a different language (available: English, French, Spanish)</li>
-    </ol>
-    
-    <h3>Important Notes</h3>
-    <ul>
-        <li>Most users will struggle at the beginning with controls. Consider demonstrating a first question example yourself before passing control to them.</li>
-        <li>Explain to users that they need to keep the speak button pressed for the entire question duration.</li>
-        <li>Wait until the model has replied before asking new questions.</li>
-        <li>IMPORTANT: The app has a crash issue because the audio buffer is not properly refreshed and eventually overloads. To avoid this, reset the app every 3-4 questions (keeping Select/Delete buttons pressed for 2 seconds). If it crashes, reload the stream/executable.</li>
-    </ul>
-    
     <h2 id="faq">Frequently Asked Questions</h2>
     <div class="faq-item">
         <h3>How much does this solution cost? What's included?</h3>
@@ -580,7 +446,7 @@ cdk deploy</code></pre>
     
     <div class="faq-item">
         <h3>Is there a trial/POC version available? Is it open source?</h3>
-        <p>This is a demo to show what's possible. If interested, reach out to the AWS Spatial Computing team (through your account team), and they can guide you to build a solution for your business.</p>
+        <p>This is a demo to show what's possible. If interested in building on top, reach out to the AWS Spatial Computing team (through your account team), and they can guide you to build a solution for your business.</p>
     </div>
     
     <div class="faq-item">
@@ -594,7 +460,7 @@ cdk deploy</code></pre>
     </div>
     
     <div class="faq-item">
-        <h3>What is the typical implementation timeline and process?</h3>
+        <h3>What is the typical implementation timeline and process for digital twin projects?</h3>
         <p>Just a few weeks for a first PoC. For a production workload, a Digital Twin is a complex solution that usually takes several months to be created.</p>
     </div>
     
@@ -602,15 +468,6 @@ cdk deploy</code></pre>
         <h3>How does this compare to similar solutions in the market?</h3>
         <p>Most digital twin solutions don't include GenAI capabilities + a managed streaming service.</p>
     </div>
-    
-    <h2>Troubleshooting</h2>
-    <h3>Common Issues</h3>
-    <ul>
-        <li>If the application crashes, restart it by reloading the stream/executable.</li>
-        <li>If voice recognition is not working, check your microphone settings and ensure you're keeping the speak button pressed for the entire duration of your question.</li>
-        <li>If the AI assistant doesn't respond, make sure your knowledge base is properly set up and synced with your documentation.</li>
-        <li>For connectivity issues with GameLift Streams, ensure you have a stable internet connection with at least 10 Mbps bandwidth.</li>
-    </ul>
     
     <h2>Uninstall Instructions</h2>
     <p>To remove the deployed resources:</p>
@@ -620,7 +477,7 @@ cdk deploy</code></pre>
             <div class="code-block">
                 <div class="code-block-header">Terminal</div>
                 <pre><code>cd BedrockKnowledgeBaseVoice
-cdk destroy</code></pre>
+ cdk destroy</code></pre>
             </div>
         </li>
         <li>If you deployed the web application, delete its CDK stack as well.</li>
